@@ -1,0 +1,32 @@
+services:
+
+  mock_api:
+    build: ./mock_api
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/api/v1/jobs/events')"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  runner:
+    build: .
+    depends_on:
+      mock_api:
+        condition: service_healthy
+    environment:
+      - MOCK_API_URL=http://mock_api:5000
+      # JOB_ID defaults to a random UUID in run_pipeline.py if not set here;
+      # set it explicitly to correlate logs with a specific run:
+      # - JOB_ID=run-001
+      - TARGET_FPS=5
+      - FIELD_DETECTOR_TYPE=green_mask
+      - FIELD_DETECTOR_SPORT=football
+      - FIELD_DETECTOR_MIN_AREA=1000
+      - REPORTER_PROGRESS_INTERVAL=100
+      - LOG_LEVEL=INFO
+    volumes:
+      # Optional: mount a host directory to persist / inspect the generated video.
+      - ./data:/data
