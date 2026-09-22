@@ -1,0 +1,6 @@
+opencv-python-headless>=4.10.0.84
+numpy>=2.0.0
+shapely>=2.0.6
+pydantic>=2.9.0
+requests>=2.32.3
+pytest>=8.0.0
